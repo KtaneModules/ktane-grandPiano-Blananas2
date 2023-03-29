@@ -382,7 +382,7 @@ public class grandPianoScript : MonoBehaviour {
     void keyPress (KMSelectable key) {
         for (int i = 0; i < 88; i++) {
             if (key == Keys[i]) {
-                //Play the sound here
+                Audio.PlaySoundAtTransform(Piano[i], transform);
                 if (moduleSolved) { return; }
                 if (SolutionSeq[Inputs] == i) {
                     Debug.LogFormat("[Grand Piano #{0}] Pressed {1}, correct.", moduleId, Piano[i]);
