@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,7 +94,7 @@ public class grandPianoScript : MonoBehaviour {
             SolutionSeq[x] = Array.IndexOf(Piano, temp);
             temp = Black[Array.IndexOf(Hands, Used[x])];
             Duck[x][4] = Array.IndexOf(Piano, temp);
-            Debug.LogFormat("[Grand Piano #{0}] Set {1}: {2}", moduleId, x + 1, hset.Join(", ") + ", " + temp);
+            Debug.LogFormat("[Grand Piano #{0}] Set {1}: {2}", moduleId, x + 1, (x == 4 ? temp : hset.Join(", ") + ", " + temp));
             Debug.LogFormat("[Grand Piano #{0}] {1}Rule: {2}", moduleId, (x == 4 ? "" : LogDeck(x)), Used[x].Replace(";", "(") + ((Used[x].Contains(";")) ? ")" : ""));
             Debug.LogFormat("[Grand Piano #{0}] {1} completes the hand", moduleId, Deck[x][4]);
         }
