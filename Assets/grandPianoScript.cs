@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using KModkit;
+using System.Text.RegularExpressions;
 
 public class grandPianoScript : MonoBehaviour {
 
@@ -407,6 +406,75 @@ public class grandPianoScript : MonoBehaviour {
         for (int t = 1; t < 7; t++) {
             yield return new WaitForSeconds(0.05f);
             Number.text = "Solved".Substring(0, t);
+        }
+    }
+
+    //twitch plays
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} cycle [Cycles through all sets of notes] | !{0} set 2 [Views a specific set of notes] | !{0} press B0 G#6 F4 [Presses the specified keys (note that flats are not real)]";
+    #pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        if (Regex.IsMatch(command, @"^\s*cycle\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            for (int i = 0; i < 5; i++)
+            {
+                UpdateVisuals(i + 1);
+                yield return "trywaitcancel 3";
+            }
+            yield break;
+        }
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*set\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            if (parameters.Length == 1)
+                yield return "sendtochaterror Please specify a set of notes to view!";
+            else if (parameters.Length > 2)
+                yield return "sendtochaterror Too many parameters!";
+            else
+            {
+                if (!parameters[1].EqualsAny("1", "2", "3", "4", "5"))
+                {
+                    yield return "sendtochaterror!f The specified set of notes '" + parameters[1] + "' is invalid!";
+                    yield break;
+                }
+                yield return null;
+                UpdateVisuals(int.Parse(parameters[1]));
+            }
+            yield break;
+        }
+        if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            if (parameters.Length == 1)
+                yield return "sendtochaterror Please specify at least 1 key to press!";
+            else
+            {
+                for (int i = 1; i < parameters.Length; i++)
+                {
+                    if (!Piano.Contains(parameters[i].ToUpperInvariant()))
+                    {
+                        yield return "sendtochaterror!f The specified key '" + parameters[i] + "' is invalid!";
+                        yield break;
+                    }
+                }
+                yield return null;
+                for (int i = 1; i < parameters.Length; i++)
+                {
+                    Keys[Array.IndexOf(Piano, parameters[i].ToUpperInvariant())].OnInteract();
+                    yield return new WaitForSeconds(.2f);
+                }
+            }
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        int start = Inputs;
+        for (int i = start; i < 5; i++)
+        {
+            Keys[SolutionSeq[i]].OnInteract();
+            yield return new WaitForSeconds(.2f);
         }
     }
 }
